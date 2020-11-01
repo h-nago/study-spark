@@ -1,0 +1,22 @@
+version: '3.6'
+services:
+  spark-master:
+    build: .
+    volumes:
+      - ./:/app
+    ports:
+      - 8080:8080
+      - 4040:4040
+      - 8081:8081
+    # command: bash -c "source /root/.sdkman/bin/sdkman-init.sh && spark-class org.apache.spark.deploy.master.Master --host 0.0.0.0"
+    command: bash -c "source /root/.sdkman/bin/sdkman-init.sh && ./sbin/start-master.sh && tail -f /dev/null"
+  spark-slave:
+    build: .
+    volumes:
+      - ./:/app
+    # command: bash -c "source /root/.sdkman/bin/sdkman-init.sh && spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077 --host 0.0.0.0"
+    command: bash -c "source /root/.sdkman/bin/sdkman-init.sh && ./sbin/start-slave.sh spark://spark-master:7077 && tail -f /dev/null"
+    deploy:
+      resources:
+        limits:
+          cpus: 1
